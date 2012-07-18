@@ -21,6 +21,7 @@ def run(string, thread=False):
     line = line.split(string)[0]
     result = line.replace("<tr>", "").replace("<td>", "").replace("</td>", "")
     result = ["md5hashcracker.appspot.com", result]
-    if thread:
-        say(result)
-    return result
+    if not "html" in result[1]:
+        if thread:
+            say(result)
+        return result

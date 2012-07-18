@@ -1,5 +1,6 @@
-import mechanize
+import mechanize, sys, os, hashlib, re
 from xgoogle.search import GoogleSearch
+from xgoogle import BeautifulSoup
 
 def init():
     print "[%s] enabled" % __name__.upper()
@@ -34,6 +35,63 @@ def run(string, thread=False):
                 return result
 
 
+    class googlewordlist():
+
+        #Using an implementation of pybozo from: https://github.com/kura/pybozo
+
+        def __init__(self):
+            pass
+
+        def crack(self, hash):
+            user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.8 (KHTML, like Gecko) Chrome/17.0.938.0 Safari/535.8"
+            url = "http://www.google.com/search?sourceid=chrome&q=%s" % hash
+            headers = {'User-Agent': user_agent}
+
+            request = mechanize.Request(url, None, headers)
+            response = mechanize.urlopen(request)
+
+            if not thread:
+                say("Generating wordlist from: '%s'" % url)
+
+            #Using beautifulsoup to get only text, no html tags from: http://stackoverflow.com/questions/1936466/beautifulsoup-grab-visible-webpage-text
+
+            html = response.read()
+            soup = BeautifulSoup.BeautifulSoup(html)
+            texts = soup.findAll(text=True)
+
+            def visible(element):
+                if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
+                    return False
+                elif re.match('<!--.*-->', str(element)):
+                    return False
+                return True
+
+            wordlist = filter(visible, texts)
+
+            wordlist = [ word.encode('utf-8') for word in wordlist ]
+
+            if not thread:
+                say("WordList entries: %i" % len(wordlist))
+            plain_text = self.dictionary_attack(hash, wordlist)
+            if plain_text:
+                return plain_text
+
+        def dictionary_attack(self, hash, wordlist):
+            if not thread:
+                say("WordList attack: '%s'" % hash)
+            for word in wordlist:
+                if hashlib.md5(word).hexdigest() == hash.lower():
+                    return word
+
+        def run(self, string):
+            result = self.crack(string)
+            if result:
+                result = ["google.com", result]
+                if thread:
+                    say(result)
+                return result
+
+
     class md5database():
 
         def __init__(self):
@@ -57,65 +115,12 @@ def run(string, thread=False):
                 return result
 
 
-    class md5pass():
-
-        def __init__(self):
-            pass
-
-        def run(self, string):
-
-            query = "site:http://md5pass.com %s" % string
-
-            if not thread:
-                say("Querying Google: '%s'" % query)
-
-            gs = GoogleSearch(query)
-            gs.results_per_page = 10
-            results = gs.get_results()
-            if len(results) >= 1:
-                for result in results:
-                    print result.title
-                    print result.desc
-                result = None
-                result = ["md5pass.com", result]
-                if thread:
-                    say(result)
-                return result
-
-
-    class md5hashcracker():
-
-        def __init__(self):
-            pass
-
-        def run(self, string):
-
-            query = "site:md5hashcracker.appspot.com/hashdb %s" % string
-
-            if not thread:
-                say("Querying Google: '%s'" % query)
-
-            gs = GoogleSearch(query)
-            gs.results_per_page = 10
-            results = gs.get_results()
-            if len(results) >= 1:
-                for result in results:
-                    print result.title
-                    print result.desc
-                result = None
-                result = ["md5hashcracker.appspot.com", result]
-                if thread:
-                    say(result)
-                return result
-
-
 #--------------------------------------------------------------------------
 
 
     sites = [
-            md5database,
-            md5pass,
-            md5hashcracker
+            googlewordlist,
+            md5database
             ]
 
     result = ["google.com", []]

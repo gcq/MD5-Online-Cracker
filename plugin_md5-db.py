@@ -16,7 +16,7 @@ def run(string, thread=False):
             if string in i and "verwenden" in i:
                 result = i.strip().replace('<strong>Es wurden 1 m\xf6gliche Begriffe gefunden, die den Hash %s verwenden:</strong><ul><li>' % string, "").replace('</li>', "")
         if thread:
-            say(["stringfunction.com", result])
-        return ["stringfunction.com", result]
+            say(["md5-db.de", result])
+        return ["md5-db.de", result]
     except:
         pass

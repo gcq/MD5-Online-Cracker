@@ -27,13 +27,18 @@ def load_plugins(config_file):
 
 #-----------------Option parsing----------------------
 
+setexit = False
 p = optparser.parser()
 options = p.run()
+
+if len(options) == 0:
+    options["help"]=True
+
 if "hash" in options:
     crack = options["hash"]
 else:
     print "Hash needed!"
-    exit()
+    setexit = True
 if "threads" in options:
     if options["threads"] != True:
         threadcount = options["threads"]
@@ -42,9 +47,13 @@ else:
 
 if "help" in options:
     print """
-    Use help=[hash] to set the has to be cracked
+    Use hash=[hash] to set the has to be cracked
     Use threads=[integer] to start the threaded process
     """
+    setexit = True
+
+if setexit:
+    exit()
 
 #---------------------MAIN----------------------------
 

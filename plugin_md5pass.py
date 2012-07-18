@@ -15,7 +15,7 @@ def run(string, thread=False):
     for i in response.readlines():
         if "Password - " in i:
             result = i.strip().replace("Password - <b>", "").replace("</b>", "")
-            result = ["hashchecker.com", result]
+            result = ["md5pass.info", result]
             if thread:
                 say(result)
             return result
