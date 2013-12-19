@@ -1,4 +1,7 @@
-import os, glob, optparser, threadpuul
+import argparse
+import time
+import concurrent.futures as futures
+from importlib import machinery
 
 #--------------Function definition--------------------
 
@@ -27,36 +30,36 @@ def load_plugins(config_file):
 
 #-----------------Option parsing----------------------
 
-setexit = False
-p = optparser.parser()
-options = p.run()
+parser = argparse.ArgumentParser()
+parser.add_argument("-H", "--hash",
+                    nargs="+",
+                    help="Hash or hashes to look up")
+parser.add_argument("-t", "--threads",
+                    type=int,
+                    default=1,
+                    help="Set the size of the threadpool")
 
-if len(options) == 0:
-    options["help"]=True
+args = parser.parse_args()
+print(args)
 
-if "hash" in options:
-    crack = options["hash"]
-else:
-    print "Hash needed!"
-    setexit = True
-if "threads" in options:
-    if options["threads"] != True:
-        threadcount = options["threads"]
-else:
-    threadcount = 2
-
-if "help" in options:
-    print """
-    Use hash=[hash] to set the has to be cracked
-    Use threads=[integer] to start the threaded process
-    """
-    setexit = True
-
-if setexit:
-    exit()
 
 #---------------------MAIN----------------------------
 
+print(machinery.SourceFileLoader("plugin_goog", ".").load_module())
+
+"""
+def testfunc(i):
+    time.sleep(1)
+    return "I'm {}".format(i)
+
+with futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
+    future_list = {executor.submit(testfunc, i):i for i in range(10)}
+    for future in futures.as_completed(future_list):
+        print(future_list[future], future.result())
+"""
+
+
+"""
 cleanup()
 
 #Load all plugins in the list
@@ -87,3 +90,4 @@ else:
         print "\nNo match found\n"
     
 cleanup()
+"""
