@@ -10,5 +10,3 @@ def get_plaintext(h):
     for node in soup.find_all("form")[1].next_siblings:
         if node.name == "b":
             return node.text
-
-print(get_plaintext("9cdfb439c7876e703e307864c9167a16"))
