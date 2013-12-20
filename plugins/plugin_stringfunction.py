@@ -1,17 +1,16 @@
-import mechanize
+import requests
+from bs4 import BeautifulSoup as bs
 
-def init():
-	print "[%s] enabled" % __name__.upper()
 
-def say(string):
-    print "[%s] %s" % (__name__.upper(), string)
-
-def run(string, thread=False):
-	br = mechanize.Browser()
-	br.open("http://www.stringfunction.com/md5-decrypter.html?s=%s" % string)
-	br.select_form("form_md5_decrypter")
-	if br["result"]:
-	    result = br["result"]
-	    if thread:
-	        say(["stringfunction.com", result])
-		return ["stringfunction.com", result]
+def get_plaintext(h):
+    web = requests.post("http://www.stringfunction.com/md5-decrypter.html",
+                        data={"string_md5":h,
+                              "string":"",
+                              "submit":"Decrypt",
+                              "result":""}).text
+    soup = bs(web)
+    value = soup.find(id="textarea_md5_decrypter").text
+    if value:
+        return value
+    else:
+        return None
