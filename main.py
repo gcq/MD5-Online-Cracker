@@ -25,11 +25,14 @@ parser.add_argument("-t", "--threads",
                     type=int,
                     default=1,
                     help="Set the size of the threadpool")
-parser.add_argument("-q", "--quiet",
+parser.add_argument("-v", "--verbose",
                     action="store_true",
-                    help="Just outputs hash:plaintext pairs")
+                    help="Set logging to debug level")
 
 args = parser.parse_args()
+
+if args.verbose:
+    logger.setLevel(logging.DEBUG)
 
 
 def worker(pname, h):
@@ -49,4 +52,5 @@ with futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
     for future in futures.as_completed(future_list):
         result = future.result()
         if result:
-            logger.info((future_list[future], result))
+            logger.debug("{plugin}: {res}".format(plugin=future_list[future],
+                                                  res=result))
