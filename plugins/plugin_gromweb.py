@@ -1,18 +1,8 @@
-import mechanize
+import requests
+from bs4 import BeautifulSoup as bs
 
-def init():
-	print "[%s] enabled" % __name__.upper()
 
-def say(string):
-    print "[%s] %s" % (__name__.upper(), string)
-
-def run(string, thread=False):
-	br = mechanize.Browser()
-	try:
-		br = br.open("http://md5.gromweb.com/query/%s" % string)
-		result = br.read()
-		if thread:
-		    say(["md5.gromweb.com", result])
-		return ["md5.gromweb.com", result]
-	except:
-		pass
+def get_plaintext(h):
+    web = requests.get("http://md5.gromweb.com/?md5={}".format(h)).text
+    soup = bs(web)
+    return soup.find(id="form_string")["value"]
