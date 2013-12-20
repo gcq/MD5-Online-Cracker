@@ -1,19 +1,13 @@
-import mechanize
+import requests
+from bs4 import BeautifulSoup as bs
 
-def init():
-	print "[%s] enabled" % __name__.upper()
 
-def say(string):
-    print "[%s] %s" % (__name__.upper(), string)
-
-def run(string, thread=False):
-	br = mechanize.Browser()
-	br.open("http://md5online.net/")
-	br.select_form(nr=0)
-	br["pass"] = string
-	response = br.submit()
-	result = ["md5online.net", response.readlines()[48].replace('<center><p>md5 :<b>' + string + '</b> <br>pass : <b>', "").replace("</b></p></table>", "").strip()]
-	if not "not found in our database" in result[1]:
-	    if thread:
-	        say(result)
-		return result
+def get_plaintext(h):
+    web = requests.post("http://md5online.net/",
+                        data={"pass":h,
+                              "option":"hash2text"}).text
+    soup = bs(web)
+    try:
+        return soup.find_all("center")[2].find_all("b")[1].text
+    except IndexError:
+        return None
