@@ -1,21 +1,14 @@
-import mechanize
+import requests
+from bs4 import BeautifulSoup as bs
 
-def init():
-    print "[%s] enabled" % __name__.upper()
 
-def say(string):
-    print "[%s] %s" % (__name__.upper(), string)
+def get_plaintext(h):
+    web = requests.post("http://md5pass.info/",
+                        data={"hash":h,
+                              "get_pass":"Get+Pass"}).text
+    soup = bs(web)
+    for node in soup.find_all("form")[1].next_siblings:
+        if node.name == "b":
+            return node.text
 
-def run(string, thread=False):
-    br = mechanize.Browser()
-    br.open("http://md5pass.info/")
-    br.select_form(nr=1)
-    br["hash"] = string
-    response = br.submit()
-    for i in response.readlines():
-        if "Password - " in i:
-            result = i.strip().replace("Password - <b>", "").replace("</b>", "")
-            result = ["md5pass.info", result]
-            if thread:
-                say(result)
-            return result
+print(get_plaintext("9cdfb439c7876e703e307864c9167a16"))
