@@ -1,10 +1,10 @@
+from collections import defaultdict
 import argparse
-import logging
 import concurrent.futures as futures
 import importlib
+import logging
 import plugins
 import sys
-from collections import defaultdict
 
 
 def worker(pname, h):
