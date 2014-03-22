@@ -22,16 +22,21 @@ def worker(pname, h):
 
 def do_hash(h):
     with futures.ThreadPoolExecutor(max_workers=args.threads) as executor:
-        future_list = {executor.submit(worker, i, h): i for i in plugins.PLUGINS}
+        future_list = {
+            executor.submit(worker, i, h): i for i in plugins.PLUGINS}
         confidence = defaultdict(int)
         for future in futures.as_completed(future_list):
             result = future.result()
 
             if result:
-                logger.debug("{plugin}: '{res}'".format(plugin=future_list[future], res=result))
+                logger.debug("{plugin}: '{res}'".format(
+                    plugin=future_list[future], res=result))
                 confidence[result] += 1
                 level = confidence[result]
-                logger.debug("Confidence level for '{res}': {level}".format(res=result, level=level))
+                logger.debug(
+                    "Confidence level for '{res}': {level}".format(
+                        res=result, level=level
+                    ))
                 if level >= args.confidence:
                     logger.debug("Confident about '{}'".format(result))
                     logger.info("{hash} = '{res}'".format(hash=h, res=result))
@@ -40,7 +45,8 @@ def do_hash(h):
                     break
         if level < args.confidence:
             most = sorted(confidence, key=confidence.get)[0]
-            logger.info("{hash} = '{res}' (low confidence)".format(hash=h, res=most))
+            logger.info(
+                "{hash} = '{res}' (low confidence)".format(hash=h, res=most))
         if len(confidence) == 0:
             logger.info("{} not found".format(h))
 
